@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Мама-friendly карта</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    body, html { margin: 0; padding: 0; }
+    #map { width: 100%; height: 100vh; }
+    #filters {
+      position: absolute; top: 10px; left: 10px;
+      background: white; padding: 10px; z-index: 9999;
+      border: 1px solid #ccc; border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="filters">
+  <label><input type="checkbox" id="chkBabyRoom" checked> Пеленальная комната</label><br>
+  <label><input type="checkbox" id="chkPlayArea" checked> Игровая зона</label>
+</div>
+
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+// 1. Инициализация карты
+const map = L.map('map').setView([55.7539, 37.6208], 10); // Координаты Москвы
+
+// 2. Тайл-слой (OpenStreetMap)
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19
+}).addTo(map);
+
+// Хранение маркеров
+let markers = [];
+
+// 3. Функция создания маркера
+function addMarker(item) {
+  const marker = L.marker(item.coords).addTo(map);
+  marker.bindPopup(`<b>${item.name}</b><br>${item.description}`);
+  marker.itemData = item; // сохраним данные внутри маркера
+  return marker;
+}
+
+// 4. Загрузка данных (data.json)
+fetch('data.json')
+  .then(response => response.json())
+  .then(data => {
+    // Создаём маркеры для каждого объекта
+    markers = data.map(item => addMarker(item));
+  })
+  .catch(err => console.error('Ошибка загрузки данных:', err));
+
+// 5. Фильтрация
+document.getElementById('chkBabyRoom').addEventListener('change', applyFilters);
+document.getElementById('chkPlayArea').addEventListener('change', applyFilters);
+
+function applyFilters() {
+  const babyRoomNeeded = document.getElementById('chkBabyRoom').checked;
+  const playAreaNeeded = document.getElementById('chkPlayArea').checked;
+
+  markers.forEach(marker => {
+    const { hasBabyRoom, hasPlayArea } = marker.itemData.features;
+
+    let show = true;
+    if (babyRoomNeeded && !hasBabyRoom) show = false;
+    if (playAreaNeeded && !hasPlayArea) show = false;
+
+    if (show) {
+      marker.addTo(map);
+    } else {
+      map.removeLayer(marker);
+    }
+  });
+}
+</script>
+
+</body>
+</html>

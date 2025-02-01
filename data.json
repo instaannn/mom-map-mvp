@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "name": "Кафе \"Малышок\"",
+    "coords": [55.881949, 37.659784],
+    "features": {
+      "hasBabyRoom": true,
+      "hasPlayArea": true
+    },
+    "description": "Кафе, дружелюбное к мамам: пеленальный стол, детское меню."
+  },
+  {
+    "id": 2,
+    "name": "Детская поликлиника №5",
+    "coords": [55.881909, 37.659931],
+    "features": {
+      "hasBabyRoom": false,
+      "hasPlayArea": false
+    },
+    "description": "Круглосуточно, врачи педиатры."
+  }
+]
